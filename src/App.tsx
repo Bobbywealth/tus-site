@@ -170,8 +170,8 @@ export default function TUSLandingPreview() {
     <div className="min-h-screen scroll-smooth bg-[#0a0a0a] font-sans text-white">
       <style>{`
         @keyframes tusIntroFadeUp {
-          0% { opacity: 0; transform: translateY(34px) scale(0.98); filter: blur(8px); }
-          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+          0% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes tusLightSweep {
