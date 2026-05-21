@@ -540,7 +540,7 @@ export default function TUSLandingPreview() {
           </div>
 
           <a
-            href="https://www.youtube.com/@theuntoldseason"
+            href="https://www.youtube.com/@heathergabrielle"
             target="_blank"
             rel="noreferrer"
             className="rounded-lg border border-zinc-700 px-4 sm:px-5 py-2 text-xs sm:text-sm uppercase tracking-widest transition hover:border-red-500"
@@ -831,7 +831,7 @@ export default function TUSLandingPreview() {
               <a href="https://www.youtube.com/watch?v=X2Ukw40LMTI" target="_blank" rel="noreferrer" className="transition hover:text-red-500">Latest Episode</a>
               <a href="https://www.youtube.com/watch?v=vJ4UBKezT-0" target="_blank" rel="noreferrer" className="transition hover:text-red-500">Second Episode</a>
               <a href="https://www.youtube.com/watch?v=F0SZSzeh2QA" target="_blank" rel="noreferrer" className="transition hover:text-red-500">Third Episode</a>
-              <a href="https://www.youtube.com/@theuntoldseason" target="_blank" rel="noreferrer" className="transition hover:text-red-500">YouTube Channel</a>
+              <a href="https://www.youtube.com/@heathergabrielle" target="_blank" rel="noreferrer" className="transition hover:text-red-500">YouTube Channel</a>
               <a href="#contact" className="transition hover:text-red-500">Guest Booking</a>
               <a href="#contact" className="transition hover:text-red-500">Sponsorships</a>
             </div>
