@@ -151,7 +151,7 @@ export default function TUSLandingPreview() {
     setIsCheckingOut(true);
     setCheckoutError(null);
 
-    const apiUrl = (import.meta as any).env.VITE_API_URL || "http://localhost:3001";
+    const apiUrl = (import.meta as any).env.VITE_API_URL || "https://tus-api.onrender.com";
 
     try {
       const res = await fetch(`${apiUrl}/api/checkout`, {
