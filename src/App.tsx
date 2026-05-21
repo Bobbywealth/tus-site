@@ -115,6 +115,7 @@ export default function TUSLandingPreview() {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeProductImages, setActiveProductImages] = useState<Record<string, string>>({});
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
@@ -289,9 +290,11 @@ export default function TUSLandingPreview() {
           </nav>
 
           {/* Mobile cart button */}
-          <a
-            href="#store"
-            className="flex h-12 w-12 items-center justify-center rounded-xl border border-red-700/60 text-xs font-bold uppercase tracking-[0.2em] text-zinc-200 transition hover:border-red-500 hover:text-red-400 md:hidden"
+          <button
+            type="button"
+            onClick={() => setIsCartOpen(true)}
+            className="relative flex h-12 w-12 items-center justify-center rounded-xl border border-red-700/60 text-zinc-200 transition hover:border-red-500 hover:text-red-400 md:hidden"
+            aria-label="Open cart"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -299,7 +302,7 @@ export default function TUSLandingPreview() {
             {cartItemCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-black">{cartItemCount}</span>
             )}
-          </a>
+          </button>
         </div>
 
         {/* Mobile Menu */}
@@ -314,6 +317,99 @@ export default function TUSLandingPreview() {
           </nav>
         </div>
       </header>
+
+      {/* MOBILE CART DRAWER */}
+      {isCartOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm md:hidden"
+            onClick={() => setIsCartOpen(false)}
+          />
+          {/* Drawer */}
+          <div className="fixed bottom-0 right-0 top-0 z-[101] flex w-[88vw] max-w-sm flex-col bg-black border-l border-zinc-800 shadow-2xl shadow-red-950/20 md:hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-red-500">Your Cart</p>
+                <p className="mt-0.5 text-sm font-bold text-zinc-300">{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 text-zinc-400 transition hover:border-red-600 hover:text-red-400"
+                aria-label="Close cart"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Cart items */}
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              {cart.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <svg className="h-14 w-14 text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <p className="text-sm font-semibold text-zinc-400">Your cart is empty</p>
+                  <p className="mt-1 text-xs text-zinc-600">Add some merch to get started</p>
+                  <button
+                    type="button"
+                    onClick={() => { setIsCartOpen(false); document.getElementById('store')?.scrollIntoView({ behavior: 'smooth' }); }}
+                    className="mt-6 rounded-xl border border-red-600/50 bg-red-600/10 px-6 py-3 text-xs font-bold uppercase tracking-widest text-red-400 transition hover:bg-red-600/20"
+                  >
+                    Browse Store
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {cart.map((item) => (
+                    <div key={item.cartKey} className="flex gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+                      <img src={item.imageUrl} alt={item.name} className="h-20 w-20 rounded-xl bg-black object-contain p-1" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-black uppercase leading-tight">{item.name}</p>
+                        <p className="mt-1 text-xs uppercase tracking-widest text-zinc-500">{item.option}</p>
+                        <div className="mt-3 flex items-center justify-between">
+                          <div className="flex items-center overflow-hidden rounded-lg border border-zinc-800">
+                            <button type="button" onClick={() => updateCartQuantity(item.cartKey, item.quantity - 1)} className="px-3 py-1.5 text-sm font-bold text-zinc-300 transition hover:bg-red-600 hover:text-white">−</button>
+                            <span className="px-3 py-1.5 text-sm font-bold">{item.quantity}</span>
+                            <button type="button" onClick={() => updateCartQuantity(item.cartKey, item.quantity + 1)} className="px-3 py-1.5 text-sm font-bold text-zinc-300 transition hover:bg-red-600 hover:text-white">+</button>
+                          </div>
+                          <p className="text-sm font-black text-red-500">${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer with total + checkout */}
+            {cart.length > 0 && (
+              <div className="border-t border-zinc-800 px-5 py-5">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs uppercase tracking-widest text-zinc-400">Subtotal</span>
+                  <span className="text-xl font-black text-white">${cartSubtotal.toFixed(2)}</span>
+                </div>
+                {checkoutError && (
+                  <p className="mb-3 text-xs text-red-400">{checkoutError}</p>
+                )}
+                <button
+                  type="button"
+                  disabled={isCheckingOut}
+                  onClick={handleCheckout}
+                  className="w-full rounded-xl bg-red-600 py-4 font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-red-900/30 transition hover:bg-red-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+                >
+                  {isCheckingOut ? "Processing..." : `Pay $${cartSubtotal.toFixed(2)}`}
+                </button>
+                <p className="mt-3 text-center text-[10px] uppercase tracking-widest text-zinc-600">Secure checkout • Stripe</p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* HERO */}
       <section id="home" className="relative flex min-h-[85vh] sm:min-h-[720px] items-center overflow-hidden">
