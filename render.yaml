@@ -1,0 +1,21 @@
+# render.yaml — The Untold Season API (Stripe backend)
+# Docs: https://render.com/docs/render-yaml
+
+services:
+  - type: web
+    name: tus-api
+    env: node
+    region: oregon
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://theuntoldseason.com,http://localhost:5173"
+      - key: PORT
+        value: "3001"

@@ -115,6 +115,8 @@ export default function TUSLandingPreview() {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeProductImages, setActiveProductImages] = useState<Record<string, string>>({});
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const addToCart = (product: Product) => {
     const selectedOption = selectedOptions[product.id] || product.options[0];
@@ -142,6 +144,40 @@ export default function TUSLandingPreview() {
         },
       ];
     });
+  };
+
+  const handleCheckout = async () => {
+    if (cart.length === 0 || isCheckingOut) return;
+    setIsCheckingOut(true);
+    setCheckoutError(null);
+
+    const apiUrl = (import.meta as any).env.VITE_API_URL || "http://localhost:3001";
+
+    try {
+      const res = await fetch(`${apiUrl}/api/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.map((item) => ({
+            id: item.id,
+            option: item.option,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Checkout failed" }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      const { url } = await res.json();
+      window.location.href = url; // Redirect to Stripe Checkout
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      setCheckoutError(err.message || "Something went wrong. Please try again.");
+      setIsCheckingOut(false);
+    }
   };
 
   const updateCartQuantity = (cartKey: string, quantity: number) => {
@@ -590,12 +626,16 @@ export default function TUSLandingPreview() {
                 </div>
                 <p className="mt-3 text-xs leading-relaxed text-zinc-500">Taxes, shipping, and Stripe payment processing can be added during checkout integration.</p>
 
+                {checkoutError && (
+                  <p className="mt-3 text-center text-sm text-red-400">{checkoutError}</p>
+                )}
                 <button
                   type="button"
-                  disabled={cart.length === 0}
-                  className="mt-6 w-full rounded-xl bg-red-600 px-6 py-4 font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+                  disabled={cart.length === 0 || isCheckingOut}
+                  onClick={handleCheckout}
+                  className="mt-6 w-full rounded-xl bg-red-600 px-6 py-4 font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-red-900/30 transition hover:bg-red-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none"
                 >
-                  Checkout Coming Soon
+                  {isCheckingOut ? "Processing..." : cartSubtotal > 0 ? `Pay $${cartSubtotal.toFixed(2)}` : "Checkout Coming Soon"}
                 </button>
               </div>
             </aside>
