@@ -16,15 +16,18 @@ console.log("STRIPE_KEY starts with:", (process.env.STRIPE_SECRET_KEY || "").sub
 console.log("STRIPE_KEY length:", (process.env.STRIPE_SECRET_KEY || "").length);
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "http://localhost:5173").split(",");
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "https://theuntoldseason.com,http://localhost:5173").split(",");
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.some((o) => origin.startsWith(o.trim()))) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS policy blocked: ${origin}`));
-      }
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      // Allow any origin that starts with an allowed prefix
+      const allowed = allowedOrigins.some((o) => origin.startsWith(o.trim()));
+      if (allowed) return callback(null, true);
+      // Reject — but don't throw, just deny
+      callback(new Error(`CORS not allowed: ${origin}`));
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
